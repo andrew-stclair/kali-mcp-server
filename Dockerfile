@@ -2,7 +2,7 @@ FROM kalilinux/kali-rolling
 
 # Install required tools
 RUN apt-get update && apt-get install -y \
-    nmap nikto sqlmap wpscan dirb exploitdb python3 python3-pip python3-venv sudo && \
+    nmap nikto sqlmap wpscan dirb exploitdb python3 python3-pip python3-venv sudo libcap2-bin && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
