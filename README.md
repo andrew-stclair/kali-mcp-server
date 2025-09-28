@@ -59,8 +59,8 @@ curl http://localhost:8080/
 ```
 
 ## GitHub Actions
-- Workflow in `.github/workflows/docker-build.yml` builds and pushes the Docker image to DockerHub on push to `main`.
-- Set `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets in your repository.
+- Workflow in `.github/workflows/docker-build.yml` builds the Docker image on pull requests and pushes to GitHub Container Registry only on merge to `main`.
+- Uses GitHub token authentication for container registry access.
 
 ## Security
 - Runs as non-root user
