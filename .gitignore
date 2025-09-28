@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .env
 =*
+# Test virtual environments
+test_venv/
+venv/
