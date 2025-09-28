@@ -6,6 +6,7 @@ A FastAPI-based MCP server running in a Kali Linux Docker container, exposing se
 - HTTP API (port 8080) for each tool
 - Input sanitization
 - Non-root execution with required capabilities
+- Python virtual environment for dependency isolation
 - Dockerfile for reproducible builds
 - GitHub Actions workflow for CI/CD
 
@@ -33,4 +34,5 @@ A FastAPI-based MCP server running in a Kali Linux Docker container, exposing se
 ## Security
 - Runs as non-root user
 - Input sanitization to prevent command injection
+- Uses Python virtual environment to comply with PEP 668 (externally managed environment)
 - For educational use only
