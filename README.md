@@ -1,55 +1,91 @@
 # Kali MCP Pentest Server
 
-A Model Context Protocol (MCP) server running in a Kali Linux Docker container, exposing security tools (nmap, nikto, sqlmap, wpscan, dirb, searchsploit, ping, traceroute) via MCP for integration with AI assistants and automation platforms like N8N.
+A Model Context Protocol (MCP) server that provides access to essential penetration testing tools through a standardized interface. Built on Kali Linux and designed for integration with AI assistants and automation platforms.
 
-## Features
-- **MCP Protocol Support** - Compatible with N8N and other MCP clients  
-- **8 Security Tools** as MCP tools with proper schemas
-- **Input sanitization** to prevent command injection
-- **Non-root execution** with required capabilities
-- **Python virtual environment** for dependency isolation
-- **Docker containerization** for reproducible builds
-- **Multiple transport protocols** (SSE, HTTP, stdio)
-- **Backward compatibility** with HTTP API endpoints
-- GitHub Actions workflow for CI/CD
+## Overview
 
-## Usage
+This project packages 8 essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls.
+
+## Available Tools
+
+The server provides the following security testing tools via MCP:
+
+| Tool | Purpose | Parameter | Example Command |
+|------|---------|-----------|-----------------|
+| `nmap_scan` | Network port scanning | `target` (hostname/IP) | `nmap -Pn <target>` |
+| `nikto_scan` | Web server vulnerability scanning | `target` (hostname/IP) | `nikto -h <target>` |
+| `sqlmap_scan` | SQL injection testing | `target` (URL) | `sqlmap -u <target> --batch` |
+| `wpscan_scan` | WordPress security scanning | `target` (WordPress URL) | `wpscan --url <target>` |
+| `dirb_scan` | Directory/file enumeration | `target` (URL) | `dirb <target>` |
+| `searchsploit_query` | Exploit database search | `query` (search term) | `searchsploit <query>` |
+| `ping_scan` | Network connectivity test | `target` (hostname/IP) | `ping -c 4 <target>` |
+| `traceroute_scan` | Network path tracing | `target` (hostname/IP) | `traceroute <target>` |
+
+## Architecture
+
+- **Base**: Kali Linux (`kalilinux/kali-rolling`) Docker container
+- **Framework**: FastMCP for MCP protocol implementation
+- **Transport**: StreamableHTTP (supports SSE and HTTP endpoints)
+- **Security**: Non-root execution with minimal required capabilities
+- **Dependencies**: Python virtual environment with required packages
+
+## Quick Start
 
 ### Using Docker Compose (Recommended)
-1. Start the service:
-   ```bash
-   docker compose up -d
-   ```
-2. View logs:
-   ```bash
-   docker compose logs -f
-   ```
-3. Stop the service:
-   ```bash
-   docker compose down
-   ```
 
-### Using Docker (Manual)
-1. Build the Docker image:
-   ```bash
-   docker build -t kali-mcp-server .
-   ```
-2. Run the container:
-   ```bash
-   docker run -p 8080:8080 --cap-add=NET_RAW --cap-add=NET_ADMIN --cap-add=NET_BIND_SERVICE kali-mcp-server
-   ```
+```bash
+# Start the server
+docker compose up -d
 
-## MCP (Model Context Protocol) Usage
+# View logs
+docker compose logs -f
 
-This server implements the MCP protocol for integration with AI assistants and automation platforms.
+# Stop the server
+docker compose down
+```
 
-### MCP Client Integration (N8N)
+### Using Docker
 
-1. **Server URL**: `http://localhost:8080/mcp`
-2. **Transport**: HTTP with Server-Sent Events (SSE)
-3. **Protocol**: JSON-RPC 2.0 over HTTP
+```bash
+# Build the image
+docker build -t kali-mcp-server .
 
-#### N8N Configuration
+# Run the container
+docker run -p 8080:8080 \
+  --cap-add=NET_RAW \
+  --cap-add=NET_ADMIN \
+  --cap-add=NET_BIND_SERVICE \
+  kali-mcp-server
+```
+
+### Using Pre-built Image
+
+```bash
+# Pull and run the latest image from GitHub Container Registry
+docker run -p 8080:8080 \
+  --cap-add=NET_RAW \
+  --cap-add=NET_ADMIN \
+  --cap-add=NET_BIND_SERVICE \
+  ghcr.io/andrew-stclair/kali-mcp-server/kali-mcp-server:latest
+```
+
+## MCP Integration
+
+### Protocol Details
+
+- **Server Name**: `kali-mcp-pentest-server`
+- **Transport**: StreamableHTTP
+- **Host**: `0.0.0.0`
+- **Port**: `8080`
+- **Endpoints**:
+  - MCP Protocol: `http://localhost:8080/mcp`
+  - Server-Sent Events: `http://localhost:8080/sse`
+  - Status Check: `http://localhost:8080/`
+
+### Client Configuration
+
+For MCP clients like N8N:
+
 ```json
 {
   "serverUrl": "http://localhost:8080",
@@ -58,81 +94,97 @@ This server implements the MCP protocol for integration with AI assistants and a
 }
 ```
 
-**Important**: N8N will handle the MCP session management automatically. The server is configured with:
-- **SSE endpoint**: `http://localhost:8080/sse` 
-- **HTTP endpoint**: `http://localhost:8080/mcp`
-- **Session management**: Automatic via StreamableHTTP transport
+### Testing MCP Connection
 
-### Available MCP Tools
-
-| Tool Name | Description | Parameter |
-|-----------|-------------|-----------|
-| `nmap_scan` | Network port scanner | `target` (string) |
-| `nikto_scan` | Web server vulnerability scanner | `target` (string) |
-| `sqlmap_scan` | SQL injection testing tool | `target` (string) |
-| `wpscan_scan` | WordPress security scanner | `target` (string) |
-| `dirb_scan` | Directory/file brute force scanner | `target` (string) |
-| `searchsploit_query` | Exploit database search | `query` (string) |
-| `ping_scan` | Network connectivity test | `target` (string) |
-| `traceroute_scan` | Network path trace | `target` (string) |
-
-### MCP Client Testing
-
-The MCP protocol requires session management. For direct testing, you can:
-
-1. **Connect to SSE endpoint** to get session information:
 ```bash
+# Check server status
+curl http://localhost:8080/
+
+# Connect to SSE endpoint for session info
 curl -H "Accept: text/event-stream" http://localhost:8080/sse
 ```
 
-2. **Use MCP-compatible client libraries** like the official MCP Python client
-3. **Use N8N's MCP tool node** which handles the protocol automatically
+## Security Features
 
-### Manual MCP Testing (Advanced)
+### Input Validation
+- Sanitizes all user inputs to prevent command injection
+- Blocks dangerous characters: `;&|$`\`\\n\\r`
+- Validates tool names against allowed list
 
-```python
-# This requires implementing MCP session management
-# Recommended to use official MCP client libraries instead
-```
+### Runtime Security
+- Runs as non-root user (`kaliuser`)
+- Uses Python virtual environment for dependency isolation
+- Required Linux capabilities: `NET_RAW`, `NET_ADMIN`, `NET_BIND_SERVICE`
+- Tool execution timeout: 120 seconds
 
-## Legacy HTTP API Endpoints
+### Tool Restrictions
+- Only whitelisted tools can be executed
+- Fixed command-line arguments prevent arbitrary command execution
+- Subprocess isolation with proper error handling
 
-For backward compatibility, the server still supports direct HTTP API access:
-Access the legacy HTTP API endpoints (POST requests):
-- `/nmap` (target)
-- `/nikto` (target)
-- `/sqlmap` (target)
-- `/wpscan` (target)
-- `/dirb` (target)
-- `/searchsploit` (query)
-- `/ping` (target)
-- `/traceroute` (target)
+## Development
 
-### Example Usage
-Test the legacy HTTP API endpoints using curl:
+### Local Development
+
 ```bash
-# Test nmap scan (legacy HTTP API)
-curl -X POST -F "target=scanme.nmap.org" http://localhost:8080/nmap
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-# Test ping connectivity (legacy HTTP API)
-curl -X POST -F "target=8.8.8.8" http://localhost:8080/ping
+# Install dependencies
+pip install -r requirements.txt
 
-# Test traceroute path trace (legacy HTTP API)
-curl -X POST -F "target=google.com" http://localhost:8080/traceroute
-
-# Test searchsploit query (legacy HTTP API)
-curl -X POST -F "query=apache" http://localhost:8080/searchsploit
-
-# Check service status (works with both MCP and HTTP)
-curl http://localhost:8080/
+# Run the server
+python main.py
 ```
 
-## GitHub Actions
-- Workflow in `.github/workflows/docker-build.yml` builds the Docker image on pull requests and pushes to GitHub Container Registry only on merge to `main`.
-- Uses GitHub token authentication for container registry access.
+### Dependencies
 
-## Security
-- Runs as non-root user
-- Input sanitization to prevent command injection
-- Uses Python virtual environment to comply with PEP 668 (externally managed environment)
-- For educational use only
+- `fastapi` - Web framework
+- `uvicorn` - ASGI server
+- `python-multipart` - Form data handling
+- `mcp>=1.15.0` - Model Context Protocol implementation
+
+### Container Build Process
+
+The Dockerfile performs these steps:
+
+1. Starts with Kali Linux rolling release
+2. Installs security tools and Python dependencies
+3. Creates non-root user with sudo privileges
+4. Sets up proper file ownership and capabilities
+5. Creates Python virtual environment
+6. Installs Python packages in isolated environment
+7. Exposes port 8080 and runs the MCP server
+
+## CI/CD Pipeline
+
+The GitHub Actions workflow (`.github/workflows/docker-build.yml`):
+
+- **Triggers**: Push to `main` branch, pull requests
+- **Build**: Multi-architecture (linux/amd64, linux/arm64)
+- **Registry**: GitHub Container Registry (`ghcr.io`)
+- **Deployment**: Automatic on merge to `main`
+
+## Security Considerations
+
+⚠️ **Educational Use Only**: This tool is intended for learning and authorized testing only.
+
+### Important Notes
+
+- Always obtain proper authorization before testing targets
+- Use only on systems you own or have explicit permission to test
+- The container requires elevated network capabilities for certain tools
+- Input validation helps prevent command injection but shouldn't be your only security layer
+- Monitor logs for suspicious activity
+
+### Capabilities Required
+
+The container needs these Linux capabilities:
+- `NET_RAW`: For raw socket operations (nmap, ping)
+- `NET_ADMIN`: For network administration tasks
+- `NET_BIND_SERVICE`: For binding to privileged ports if needed
+
+## License
+
+This project is for educational purposes. Users are responsible for compliance with applicable laws and regulations.
