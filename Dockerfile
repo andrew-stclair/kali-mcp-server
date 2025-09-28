@@ -2,7 +2,7 @@ FROM kalilinux/kali-rolling
 
 # Install required tools
 RUN apt-get update && apt-get install -y \
-    nmap nikto sqlmap wpscan dirb exploitdb python3 python3-pip sudo && \
+    nmap nikto sqlmap wpscan dirb exploitdb python3 python3-pip python3-venv sudo && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -19,8 +19,10 @@ USER kaliuser
 COPY . /home/kaliuser/app
 WORKDIR /home/kaliuser/app
 
-# Install Python dependencies
-RUN pip3 install -r requirements.txt
+# Create virtual environment and install Python dependencies
+RUN python3 -m venv venv && \
+    venv/bin/pip install --upgrade pip && \
+    venv/bin/pip install -r requirements.txt
 
 EXPOSE 8080
-CMD ["python3", "main.py"]
+CMD ["./venv/bin/python", "main.py"]
