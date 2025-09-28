@@ -57,3 +57,7 @@ def searchsploit_query(query: str = Form(...)):
 @app.get("/")
 def root():
     return {"message": "Kali MCP Pentest Server running"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
