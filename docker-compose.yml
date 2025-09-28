@@ -1,0 +1,11 @@
+services:
+  kali-mcp-server:
+    build: .
+    ports:
+      - "8080:8080"
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+    restart: unless-stopped
+    container_name: kali-mcp-server
