@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, and searchsploit.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, searchsploit, ping, and traceroute.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -112,6 +112,34 @@ def searchsploit_query(query: str) -> str:
     """
     query = sanitize_target(query)
     return run_tool("searchsploit", [query])
+
+@mcp.tool()
+def ping_scan(target: str) -> str:
+    """
+    Run ping network connectivity test on a target.
+    
+    Args:
+        target: The target hostname or IP address to ping
+        
+    Returns:
+        String containing ping results
+    """
+    target = sanitize_target(target)
+    return run_tool("ping", ["-c", "4", target])
+
+@mcp.tool()
+def traceroute_scan(target: str) -> str:
+    """
+    Run traceroute network path trace to a target.
+    
+    Args:
+        target: The target hostname or IP address to trace route to
+        
+    Returns:
+        String containing traceroute results
+    """
+    target = sanitize_target(target)
+    return run_tool("traceroute", [target])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])

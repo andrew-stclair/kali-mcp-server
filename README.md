@@ -1,10 +1,10 @@
 # Kali MCP Pentest Server
 
-A Model Context Protocol (MCP) server running in a Kali Linux Docker container, exposing security tools (nmap, nikto, sqlmap, wpscan, dirb, searchsploit) via MCP for integration with AI assistants and automation platforms like N8N.
+A Model Context Protocol (MCP) server running in a Kali Linux Docker container, exposing security tools (nmap, nikto, sqlmap, wpscan, dirb, searchsploit, ping, traceroute) via MCP for integration with AI assistants and automation platforms like N8N.
 
 ## Features
 - **MCP Protocol Support** - Compatible with N8N and other MCP clients  
-- **6 Security Tools** as MCP tools with proper schemas
+- **8 Security Tools** as MCP tools with proper schemas
 - **Input sanitization** to prevent command injection
 - **Non-root execution** with required capabilities
 - **Python virtual environment** for dependency isolation
@@ -73,6 +73,8 @@ This server implements the MCP protocol for integration with AI assistants and a
 | `wpscan_scan` | WordPress security scanner | `target` (string) |
 | `dirb_scan` | Directory/file brute force scanner | `target` (string) |
 | `searchsploit_query` | Exploit database search | `query` (string) |
+| `ping_scan` | Network connectivity test | `target` (string) |
+| `traceroute_scan` | Network path trace | `target` (string) |
 
 ### MCP Client Testing
 
@@ -103,12 +105,20 @@ Access the legacy HTTP API endpoints (POST requests):
 - `/wpscan` (target)
 - `/dirb` (target)
 - `/searchsploit` (query)
+- `/ping` (target)
+- `/traceroute` (target)
 
 ### Example Usage
 Test the legacy HTTP API endpoints using curl:
 ```bash
 # Test nmap scan (legacy HTTP API)
 curl -X POST -F "target=scanme.nmap.org" http://localhost:8080/nmap
+
+# Test ping connectivity (legacy HTTP API)
+curl -X POST -F "target=8.8.8.8" http://localhost:8080/ping
+
+# Test traceroute path trace (legacy HTTP API)
+curl -X POST -F "target=google.com" http://localhost:8080/traceroute
 
 # Test searchsploit query (legacy HTTP API)
 curl -X POST -F "query=apache" http://localhost:8080/searchsploit
