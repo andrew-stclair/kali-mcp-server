@@ -7,16 +7,16 @@ RUN apt-get update && apt-get install -y \
 
 # Create non-root user
 RUN useradd -m kaliuser && echo 'kaliuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-USER kaliuser
-WORKDIR /home/kaliuser
+
+# Copy MCP server code as root and set ownership
+COPY . /home/kaliuser/app
+RUN chown -R kaliuser:kaliuser /home/kaliuser/app
 
 # Set capabilities for nmap (if needed)
-USER root
 RUN setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap
-USER kaliuser
 
-# Copy MCP server code
-COPY . /home/kaliuser/app
+# Switch to non-root user
+USER kaliuser
 WORKDIR /home/kaliuser/app
 
 # Create virtual environment and install Python dependencies
