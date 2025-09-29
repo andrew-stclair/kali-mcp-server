@@ -27,11 +27,11 @@ test-fast:
 	./venv/bin/python -m pytest tests/ -v
 
 lint:
-	./venv/bin/python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-	./venv/bin/python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+	./venv/bin/python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv
+	./venv/bin/python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv
 
 security:
-	./venv/bin/bandit -r . -f json -o bandit-report.json
+	./venv/bin/bandit -r . -f json -o bandit-report.json --exclude ./venv
 	@if [ -f bandit-report.json ]; then \
 		echo "Security report generated: bandit-report.json"; \
 		cat bandit-report.json; \
