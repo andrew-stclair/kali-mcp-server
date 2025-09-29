@@ -155,6 +155,71 @@ python main.py
 - `python-multipart` - Form data handling
 - `mcp>=1.15.0` - Model Context Protocol implementation
 
+### Testing
+
+The project includes a comprehensive testing suite that validates all MCP tools and security features.
+
+#### Quick Testing
+
+```bash
+# Install test dependencies
+pip install -r requirements-test.txt
+
+# Run all tests
+pytest tests/ -v
+
+# Run tests with coverage
+pytest tests/ -v --cov=main --cov-report=term-missing
+```
+
+#### Using Make (Recommended)
+
+```bash
+# Install development environment
+make install
+
+# Run full test suite with coverage
+make test
+
+# Run tests without coverage (faster)
+make test-fast
+
+# Run linting
+make lint
+
+# Run security analysis
+make security
+
+# Run all CI/CD checks
+make ci-test
+```
+
+#### Test Categories
+
+The test suite includes:
+
+- **Unit Tests** (`tests/test_utils.py`): Test core utility functions like input sanitization and tool execution
+- **MCP Tool Tests** (`tests/test_mcp_tools.py`): Test all 18 MCP tool functions with mock execution
+- **Server Integration Tests** (`tests/test_mcp_server.py`): Test MCP server initialization and configuration
+- **End-to-End Integration Tests** (`tests/test_integration.py`): Test complete workflows and error handling
+
+#### Test Coverage
+
+- Maintains **97%+ code coverage** with a minimum threshold of 85%
+- Tests all 18 security tools exposed via MCP protocol
+- Validates input sanitization and command injection prevention
+- Tests error handling for timeouts, permissions, and missing tools
+- Ensures tool whitelisting security controls
+
+#### GitHub Actions CI/CD
+
+Tests run automatically on:
+- Every push to the `main` branch
+- Every pull request targeting the `main` branch
+- Supports Python 3.11 and 3.12
+- Includes security scanning with bandit
+- Generates coverage reports
+
 ### Container Build Process
 
 The Dockerfile performs these steps:

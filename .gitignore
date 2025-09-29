@@ -5,3 +5,21 @@ __pycache__/
 # Test virtual environments
 test_venv/
 venv/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+bandit-report.json
+.tox/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
