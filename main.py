@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, ping, and traceroute.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, ping, and traceroute.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -182,6 +182,20 @@ def gobuster_vhost_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("gobuster", ["vhost", "-u", target, "-w", "/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"])
+
+@mcp.tool()
+def sherlock_scan(username: str) -> str:
+    """
+    Run sherlock username reconnaissance tool to find social media accounts.
+    
+    Args:
+        username: The username to search for across social networks
+        
+    Returns:
+        String containing sherlock scan results with found social media profiles
+    """
+    username = sanitize_target(username)
+    return run_tool("sherlock", ["--timeout", "30", "--print-found", "--no-color", "--local", username])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
