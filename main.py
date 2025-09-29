@@ -195,7 +195,7 @@ def sherlock_scan(username: str) -> str:
         String containing sherlock scan results with found social media profiles
     """
     username = sanitize_target(username)
-    return run_tool("sherlock", ["--timeout", "30", "--print-found", "--no-color", "--local", username])
+    return run_tool("sherlock", ["--timeout", "30", "--print-found", "--no-color", username])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
