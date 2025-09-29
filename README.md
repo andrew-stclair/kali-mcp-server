@@ -4,7 +4,7 @@ A Model Context Protocol (MCP) server that provides access to essential penetrat
 
 ## Overview
 
-This project packages 8 essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls.
+This project packages 9 essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls.
 
 ## Available Tools
 
@@ -21,6 +21,7 @@ The server provides the following security testing tools via MCP:
 | `gobuster_dns_scan` | DNS subdomain brute force | `target` (domain) | `gobuster dns -d <target> -w seclists/subdomains` |
 | `gobuster_vhost_scan` | Virtual host brute force | `target` (URL) | `gobuster vhost -u <target> -w seclists/subdomains` |
 | `searchsploit_query` | Exploit database search | `query` (search term) | `searchsploit <query>` |
+| `sherlock_scan` | Username reconnaissance across social networks | `username` (username to search) | `sherlock --timeout 30 --print-found <username>` |
 | `ping_scan` | Network connectivity test | `target` (hostname/IP) | `ping -c 4 <target>` |
 | `traceroute_scan` | Network path tracing | `target` (hostname/IP) | `traceroute <target>` |
 
