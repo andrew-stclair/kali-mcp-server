@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, searchsploit, ping, and traceroute.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, ping, and traceroute.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -140,6 +140,48 @@ def traceroute_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("traceroute", [target])
+
+@mcp.tool()
+def gobuster_dir_scan(target: str) -> str:
+    """
+    Run gobuster directory/file brute force scanner on a target URL.
+    
+    Args:
+        target: The target URL to scan for directories and files
+        
+    Returns:
+        String containing gobuster directory scan results
+    """
+    target = sanitize_target(target)
+    return run_tool("gobuster", ["dir", "-u", target, "-w", "/usr/share/seclists/Discovery/Web-Content/common.txt"])
+
+@mcp.tool()
+def gobuster_dns_scan(target: str) -> str:
+    """
+    Run gobuster DNS subdomain brute force scanner on a target domain.
+    
+    Args:
+        target: The target domain to scan for subdomains
+        
+    Returns:
+        String containing gobuster DNS scan results
+    """
+    target = sanitize_target(target)
+    return run_tool("gobuster", ["dns", "-d", target, "-w", "/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"])
+
+@mcp.tool()
+def gobuster_vhost_scan(target: str) -> str:
+    """
+    Run gobuster virtual host brute force scanner on a target URL.
+    
+    Args:
+        target: The target URL to scan for virtual hosts
+        
+    Returns:
+        String containing gobuster vhost scan results
+    """
+    target = sanitize_target(target)
+    return run_tool("gobuster", ["vhost", "-u", target, "-w", "/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])

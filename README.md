@@ -17,6 +17,9 @@ The server provides the following security testing tools via MCP:
 | `sqlmap_scan` | SQL injection testing | `target` (URL) | `sqlmap -u <target> --batch` |
 | `wpscan_scan` | WordPress security scanning | `target` (WordPress URL) | `wpscan --url <target>` |
 | `dirb_scan` | Directory/file enumeration | `target` (URL) | `dirb <target>` |
+| `gobuster_dir_scan` | Directory/file brute force | `target` (URL) | `gobuster dir -u <target> -w seclists/common` |
+| `gobuster_dns_scan` | DNS subdomain brute force | `target` (domain) | `gobuster dns -d <target> -w seclists/subdomains` |
+| `gobuster_vhost_scan` | Virtual host brute force | `target` (URL) | `gobuster vhost -u <target> -w seclists/subdomains` |
 | `searchsploit_query` | Exploit database search | `query` (search term) | `searchsploit <query>` |
 | `ping_scan` | Network connectivity test | `target` (hostname/IP) | `ping -c 4 <target>` |
 | `traceroute_scan` | Network path tracing | `target` (hostname/IP) | `traceroute <target>` |
