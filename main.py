@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, ping, and traceroute.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, and traceroute.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -196,6 +196,20 @@ def sherlock_scan(username: str) -> str:
     """
     username = sanitize_target(username)
     return run_tool("sherlock", ["--timeout", "30", "--print-found", "--no-color", username])
+
+@mcp.tool()
+def whatweb_scan(target: str) -> str:
+    """
+    Run whatweb web technology scanner on a target URL.
+    
+    Args:
+        target: The target URL to scan for web technologies
+        
+    Returns:
+        String containing whatweb scan results identifying web technologies
+    """
+    target = sanitize_target(target)
+    return run_tool("whatweb", ["--no-color", target])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
