@@ -153,7 +153,7 @@ def gobuster_dir_scan(target: str) -> str:
         String containing gobuster directory scan results
     """
     target = sanitize_target(target)
-    return run_tool("gobuster", ["dir", "-u", target, "-w", "/usr/share/wordlists/dirb/common.txt"])
+    return run_tool("gobuster", ["dir", "-u", target, "-w", "/usr/share/seclists/Discovery/Web-Content/common.txt"])
 
 @mcp.tool()
 def gobuster_dns_scan(target: str) -> str:
@@ -167,7 +167,7 @@ def gobuster_dns_scan(target: str) -> str:
         String containing gobuster DNS scan results
     """
     target = sanitize_target(target)
-    return run_tool("gobuster", ["dns", "-d", target, "-w", "/usr/share/wordlists/dirb/common.txt"])
+    return run_tool("gobuster", ["dns", "-d", target, "-w", "/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"])
 
 @mcp.tool()
 def gobuster_vhost_scan(target: str) -> str:
@@ -181,7 +181,7 @@ def gobuster_vhost_scan(target: str) -> str:
         String containing gobuster vhost scan results
     """
     target = sanitize_target(target)
-    return run_tool("gobuster", ["vhost", "-u", target, "-w", "/usr/share/wordlists/dirb/common.txt"])
+    return run_tool("gobuster", ["vhost", "-u", target, "-w", "/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
