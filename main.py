@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, and hping3.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, hping3, and arping.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -252,6 +252,20 @@ def hping3_traceroute_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("hping3", ["--traceroute", "-c", "3", "-S", "-p", "80", target])
+
+@mcp.tool()
+def arping_scan(target: str) -> str:
+    """
+    Run arping ARP ping test on a target for Layer 2 connectivity testing.
+    
+    Args:
+        target: The target hostname or IP address to ARP ping
+        
+    Returns:
+        String containing arping results for Layer 2 connectivity analysis
+    """
+    target = sanitize_target(target)
+    return run_tool("arping", ["-c", "4", target])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
