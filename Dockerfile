@@ -3,7 +3,7 @@ FROM kalilinux/kali-rolling
 # Install required tools
 RUN apt-get update && apt-get install -y \
     nmap nikto sqlmap wpscan dirb gobuster seclists exploitdb sherlock whatweb python3 python3-pip python3-venv sudo libcap2-bin \
-    iputils-ping traceroute hping3 && \
+    iputils-ping traceroute hping3 arping && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -13,9 +13,10 @@ RUN useradd -m kaliuser && echo 'kaliuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoer
 COPY . /home/kaliuser/app
 RUN chown -R kaliuser:kaliuser /home/kaliuser/app
 
-# Set capabilities for nmap and hping3 (if needed)
+# Set capabilities for nmap, hping3, and arping (if needed)
 RUN setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap && \
-    setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/sbin/hping3
+    setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/sbin/hping3 && \
+    setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/sbin/arping
 
 # Switch to non-root user
 USER kaliuser

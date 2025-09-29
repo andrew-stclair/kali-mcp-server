@@ -28,6 +28,7 @@ The server provides the following security testing tools via MCP:
 | `hping3_ping_scan` | TCP connectivity test | `target` (hostname/IP) | `hping3 -c 4 -S -p 80 <target>` |
 | `hping3_port_scan` | TCP port scanning | `target` (hostname/IP) | `hping3 -c 1 -S -p ++80 <target>` |
 | `hping3_traceroute_scan` | TCP traceroute | `target` (hostname/IP) | `hping3 --traceroute -c 3 -S -p 80 <target>` |
+| `arping_scan` | ARP ping for Layer 2 connectivity | `target` (hostname/IP) | `arping -c 4 <target>` |
 
 ## Architecture
 
