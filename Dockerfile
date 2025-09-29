@@ -3,8 +3,16 @@ FROM kalilinux/kali-rolling
 # Install required tools
 RUN apt-get update && apt-get install -y \
     nmap nikto sqlmap wpscan dirb gobuster seclists exploitdb sherlock whatweb python3 python3-pip python3-venv sudo libcap2-bin \
-    iputils-ping traceroute hping3 arping && \
+    iputils-ping traceroute hping3 arping git && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Photon web crawler
+RUN git clone https://github.com/s0md3v/Photon.git /opt/photon && \
+    cd /opt/photon && \
+    sed -i 's/\r$//' photon.py && \
+    pip3 install -r requirements.txt --break-system-packages && \
+    chmod +x photon.py && \
+    ln -s /opt/photon/photon.py /usr/local/bin/photon
 
 # Create non-root user
 RUN useradd -m kaliuser && echo 'kaliuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
