@@ -4,7 +4,7 @@ A Model Context Protocol (MCP) server that provides access to essential penetrat
 
 ## Overview
 
-This project packages 10 essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls.
+This project packages essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls.
 
 ## Available Tools
 
@@ -25,6 +25,9 @@ The server provides the following security testing tools via MCP:
 | `whatweb_scan` | Web technology identification | `target` (URL) | `whatweb --no-color <target>` |
 | `ping_scan` | Network connectivity test | `target` (hostname/IP) | `ping -c 4 <target>` |
 | `traceroute_scan` | Network path tracing | `target` (hostname/IP) | `traceroute <target>` |
+| `hping3_ping_scan` | TCP connectivity test | `target` (hostname/IP) | `hping3 -c 4 -S -p 80 <target>` |
+| `hping3_port_scan` | TCP port scanning | `target` (hostname/IP) | `hping3 -c 1 -S -p ++80 <target>` |
+| `hping3_traceroute_scan` | TCP traceroute | `target` (hostname/IP) | `hping3 --traceroute -c 3 -S -p 80 <target>` |
 
 ## Architecture
 
