@@ -9,26 +9,53 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: kalilinux/kali-rolling
+      options: --user root
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
 
     steps:
+    - name: Install git (required for checkout)
+      run: |
+        apt-get update
+        apt-get install -y git
+
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5 
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Install required system packages and security tools
+      run: |
+        apt-get update
+        apt-get install -y \
+          python3 python3-pip python3-venv \
+          nmap nikto sqlmap wpscan dirb gobuster seclists exploitdb sherlock whatweb \
+          iputils-ping traceroute hping3 arping photon \
+          libcap2-bin sudo
+        
+        # Set up Python version if different from default
+        if [ "${{ matrix.python-version }}" = "3.11" ]; then
+          apt-get install -y python3.11 python3.11-venv python3.11-dev || true
+          update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 || true
+        elif [ "${{ matrix.python-version }}" = "3.12" ]; then
+          apt-get install -y python3.12 python3.12-venv python3.12-dev || true  
+          update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 || true
+        fi
 
-    - name: Cache dependencies
+    - name: Set up capabilities for network tools
+      run: |
+        setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap || true
+        setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/sbin/hping3 || true
+        setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/sbin/arping || true
+
+    - name: Cache Python dependencies
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        key: kali-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements*.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          kali-${{ matrix.python-version }}-pip-
 
     - name: Install dependencies
       run: |
@@ -96,9 +123,10 @@ jobs:
       if: always()
       run: |
         echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment**: Kali Linux (kalilinux/kali-rolling)" >> $GITHUB_STEP_SUMMARY
         echo "- **Python Version**: ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Test Coverage**: 97%+ (enforced minimum: 85%)" >> $GITHUB_STEP_SUMMARY
-        echo "- **Security Tools Tested**: 14 total MCP tools" >> $GITHUB_STEP_SUMMARY
+        echo "- **Security Tools Tested**: 18 total MCP tools" >> $GITHUB_STEP_SUMMARY
         echo "- **Input Validation**: ✅ Command injection protection" >> $GITHUB_STEP_SUMMARY
         echo "- **Tool Whitelist**: ✅ Only approved security tools allowed" >> $GITHUB_STEP_SUMMARY
         echo "- **MCP Protocol**: ✅ All tools properly exposed via MCP" >> $GITHUB_STEP_SUMMARY
