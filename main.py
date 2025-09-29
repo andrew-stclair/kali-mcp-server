@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, and traceroute.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, and hping3.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -210,6 +210,48 @@ def whatweb_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("whatweb", ["--no-color", target])
+
+@mcp.tool()
+def hping3_ping_scan(target: str) -> str:
+    """
+    Run hping3 TCP ping test on a target for connectivity testing.
+    
+    Args:
+        target: The target hostname or IP address to ping
+        
+    Returns:
+        String containing hping3 TCP ping results for connectivity analysis
+    """
+    target = sanitize_target(target)
+    return run_tool("hping3", ["-c", "4", "-S", "-p", "80", target])
+
+@mcp.tool()
+def hping3_port_scan(target: str) -> str:
+    """
+    Run hping3 SYN port scan on common ports for reconnaissance.
+    
+    Args:
+        target: The target hostname or IP address to scan
+        
+    Returns:
+        String containing hping3 port scan results showing open/closed ports
+    """
+    target = sanitize_target(target)
+    return run_tool("hping3", ["-c", "1", "-S", "-p", "++80", target])
+
+@mcp.tool()
+def hping3_traceroute_scan(target: str) -> str:
+    """
+    Run hping3 TCP traceroute to trace network path to target.
+    
+    Args:
+        target: The target hostname or IP address to trace route to
+        
+    Returns:
+        String containing hping3 traceroute results showing network path
+    """
+    target = sanitize_target(target)
+    return run_tool("hping3", ["--traceroute", "-c", "3", "-S", "-p", "80", target])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
