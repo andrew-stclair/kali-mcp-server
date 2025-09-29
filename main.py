@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, hping3, and arping.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, hping3, arping, and photon.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping", "photon"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -266,6 +266,20 @@ def arping_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("arping", ["-c", "4", target])
+
+@mcp.tool()
+def photon_scan(target: str) -> str:
+    """
+    Run photon web crawler for OSINT and reconnaissance.
+    
+    Args:
+        target: The target URL to crawl and analyze
+        
+    Returns:
+        String containing photon scan results with discovered URLs and intelligence
+    """
+    target = sanitize_target(target)
+    return run_tool("photon", ["-u", target, "-l", "2", "--only-urls", "--timeout", "30"])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
