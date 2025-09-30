@@ -237,7 +237,7 @@ class TestHping3Tools:
         
         assert isinstance(result, str)
         mock_subprocess_run.assert_called_with(
-            ['hping3', '-c', '1', '-S', '-p', '++80', target],
+            ['hping3', '-c', '1', '-S', '-p', '80', target],
             capture_output=True,
             text=True,
             timeout=120
