@@ -236,10 +236,10 @@ The Dockerfile performs these steps:
 
 The GitHub Actions workflow (`.github/workflows/docker-build.yml`):
 
-- **Triggers**: Push to `main` branch, pull requests
+- **Triggers**: Push to `main` branch (after PR merge), weekly schedule (Sundays at 2:00 AM UTC)
 - **Build**: Multi-architecture (linux/amd64, linux/arm64)
 - **Registry**: GitHub Container Registry (`ghcr.io`)
-- **Deployment**: Automatic on merge to `main`
+- **Deployment**: Automatic on merge to `main` or weekly schedule
 
 ## Security Considerations
 
