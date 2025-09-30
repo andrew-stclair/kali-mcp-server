@@ -51,8 +51,8 @@ class TestSanitizeTarget:
                 sanitize_target(empty_input)
         
         # Spaces should be stripped and result in empty string, which should raise an error after stripping
-        stripped_result = sanitize_target("   ")
-        assert stripped_result == ""
+        with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
+            sanitize_target("   ")
 
 
 class TestRunTool:
