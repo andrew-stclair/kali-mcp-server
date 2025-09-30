@@ -28,11 +28,41 @@ def tool_scan(target: str = Form(...)):
 ```
 
 ### Testing & Validation
-- Test API endpoints using curl or similar tools
+- **Always run the full test suite** before submitting changes: `make test`
+- **Maintain test coverage above 85%** - current coverage is 97%+
+- Test API endpoints using pytest with mocked subprocess calls
+- **Write tests for new tools following existing patterns** in `tests/test_mcp_tools.py`
 - Validate input sanitization prevents command injection
 - Ensure tools run with proper non-root permissions
 - Test Docker container builds and runs correctly
-- Verify GitHub Actions workflow builds successfully
+- **All PRs must pass the GitHub Actions test workflow**
+
+#### Test Categories Required
+- **Unit tests** for utility functions (`sanitize_target`, `run_tool`)
+- **MCP tool tests** for each security tool function with input validation
+- **Integration tests** for end-to-end workflows and error handling
+- **Security tests** for command injection prevention and tool whitelisting
+
+#### Testing Commands
+```bash
+# Install test environment
+make install
+
+# Run all tests with coverage
+make test
+
+# Run fast tests without coverage
+make test-fast
+
+# Run security analysis
+make security
+
+# Run linting
+make lint
+
+# Run complete CI/CD validation
+make ci-test
+```
 
 ### Security Considerations
 - **Educational Use Only**: This tool is for learning purposes

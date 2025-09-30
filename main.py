@@ -15,9 +15,12 @@ ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "p
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
+    if target is None or not isinstance(target, str):
+        raise ValueError("Invalid target: contains dangerous characters")
+    target = target.strip()
     if not target or any(c in target for c in ";&|$`\n\r"):
         raise ValueError("Invalid target: contains dangerous characters")
-    return target.strip()
+    return target
 
 def run_tool(tool: str, args: list) -> str:
     if tool not in ALLOWED_TOOLS:
@@ -237,7 +240,7 @@ def hping3_port_scan(target: str) -> str:
         String containing hping3 port scan results showing open/closed ports
     """
     target = sanitize_target(target)
-    return run_tool("hping3", ["-c", "1", "-S", "-p", "++80", target])
+    return run_tool("hping3", ["-c", "1", "-S", "-p", "80", target])
 
 @mcp.tool()
 def hping3_traceroute_scan(target: str) -> str:
