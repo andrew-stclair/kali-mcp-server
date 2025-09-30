@@ -51,7 +51,7 @@ def expected_tool_commands():
         'sherlock': ['sherlock', '--timeout', '30', '--print-found', '--no-color'],
         'whatweb': ['whatweb', '--no-color'],
         'hping3_ping': ['hping3', '-c', '4', '-S', '-p', '80'],
-        'hping3_port': ['hping3', '-c', '1', '-S', '-p', '++80'],
+        'hping3_port': ['hping3', '-c', '1', '-S', '-p', '80'],
         'hping3_traceroute': ['hping3', '--traceroute', '-c', '3', '-S', '-p', '80'],
         'arping': ['arping', '-c', '4'],
         'photon': ['photon', '-u', '', '-l', '2', '--only-urls', '--timeout', '30']
