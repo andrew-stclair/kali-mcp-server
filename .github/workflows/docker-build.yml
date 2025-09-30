@@ -3,8 +3,9 @@ name: Build and Push Kali MCP Docker Image to GitHub Container Registry
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  schedule:
+    # Run weekly on Sundays at 2:00 AM UTC
+    - cron: '0 2 * * 0'
 
 jobs:
   build:
@@ -27,7 +28,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' }}
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/${{ github.repository }}/kali-mcp-server:latest
 permissions:
