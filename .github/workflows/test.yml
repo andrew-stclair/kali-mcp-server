@@ -73,14 +73,14 @@ jobs:
           python3 -m venv /opt/venv
         fi
         # Activate venv and install dependencies
-        source /opt/venv/bin/activate
+        . /opt/venv/bin/activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-test.txt
 
     - name: Run linting with flake8
       run: |
-        source /opt/venv/bin/activate
+        . /opt/venv/bin/activate
         pip install flake8
         # Stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv
@@ -89,7 +89,7 @@ jobs:
 
     - name: Run security check with bandit
       run: |
-        source /opt/venv/bin/activate
+        . /opt/venv/bin/activate
         pip install bandit
         bandit -r . -f json -o bandit-report.json --exclude ./venv,/opt/venv || true
         if [ -f bandit-report.json ]; then
@@ -99,7 +99,7 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        source /opt/venv/bin/activate
+        . /opt/venv/bin/activate
         pytest tests/ -v --cov=main --cov-report=xml --cov-report=term-missing --cov-fail-under=85
 
     - name: Upload coverage reports to Codecov
@@ -112,7 +112,7 @@ jobs:
 
     - name: Test MCP tool execution (mock-based validation)
       run: |
-        source /opt/venv/bin/activate
+        . /opt/venv/bin/activate
         python -c "
         from main import sanitize_target, run_tool, ALLOWED_TOOLS
         print('Testing input sanitization...')
