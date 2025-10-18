@@ -7,7 +7,7 @@ from main import (
     searchsploit_query, ping_scan, traceroute_scan, gobuster_dir_scan,
     gobuster_dns_scan, gobuster_vhost_scan, sherlock_scan, whatweb_scan,
     hping3_ping_scan, hping3_port_scan, hping3_traceroute_scan,
-    arping_scan, photon_scan
+    arping_scan, photon_scan, lynx_extract_links, lynx_get_content
 )
 
 
@@ -127,6 +127,42 @@ class TestWebScanningTools:
             timeout=120
         )
 
+    def test_lynx_extract_links_valid_target(self, mock_subprocess_run, sample_targets):
+        """Test lynx_extract_links with valid URL."""
+        target = sample_targets['valid_url']
+        result = lynx_extract_links(target)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['lynx', '-dump', '-listonly', target],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+
+    def test_lynx_get_content_valid_target(self, mock_subprocess_run, sample_targets):
+        """Test lynx_get_content with valid URL."""
+        target = sample_targets['valid_url']
+        result = lynx_get_content(target)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['lynx', '-dump', '-nolist', '-width=120', target],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+
+    def test_lynx_extract_links_dangerous_input(self, sample_targets):
+        """Test lynx_extract_links rejects dangerous input."""
+        with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
+            lynx_extract_links(sample_targets['dangerous_input'])
+
+    def test_lynx_get_content_dangerous_input(self, sample_targets):
+        """Test lynx_get_content rejects dangerous input."""
+        with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
+            lynx_get_content(sample_targets['dangerous_input'])
+
 
 class TestGobusterTools:
     """Test Gobuster brute force scanning tools."""
@@ -194,7 +230,7 @@ class TestReconnaissanceTools:
         
         assert isinstance(result, str)
         mock_subprocess_run.assert_called_with(
-            ['sherlock', '--timeout', '30', '--print-found', '--no-color', username],
+            ['sherlock', '--timeout', '3', '--print-found', '--no-color', username],
             capture_output=True,
             text=True,
             timeout=120
@@ -277,7 +313,7 @@ class TestInputValidationAcrossAllTools:
         nmap_scan, nikto_scan, sqlmap_scan, wpscan_scan, dirb_scan,
         ping_scan, traceroute_scan, gobuster_dir_scan, gobuster_dns_scan,
         gobuster_vhost_scan, whatweb_scan, hping3_ping_scan, hping3_port_scan,
-        hping3_traceroute_scan, arping_scan, photon_scan
+        hping3_traceroute_scan, arping_scan, photon_scan, lynx_extract_links, lynx_get_content
     ])
     def test_all_tools_reject_dangerous_input(self, tool_func, sample_targets):
         """Test that all tools reject dangerous input."""
@@ -297,13 +333,13 @@ class TestInputValidationAcrossAllTools:
         searchsploit_query, ping_scan, traceroute_scan, gobuster_dir_scan,
         gobuster_dns_scan, gobuster_vhost_scan, sherlock_scan, whatweb_scan,
         hping3_ping_scan, hping3_port_scan, hping3_traceroute_scan,
-        arping_scan, photon_scan
+        arping_scan, photon_scan, lynx_extract_links, lynx_get_content
     ])
     def test_all_tools_return_string(self, tool_func, sample_targets, mock_subprocess_run):
         """Test that all tools return string results."""
         # Use appropriate sample target based on tool
         if tool_func in [sqlmap_scan, wpscan_scan, dirb_scan, gobuster_dir_scan, 
-                         gobuster_vhost_scan, whatweb_scan, photon_scan]:
+                         gobuster_vhost_scan, whatweb_scan, photon_scan, lynx_extract_links, lynx_get_content]:
             target = sample_targets['valid_url']
         elif tool_func in [searchsploit_query]:
             target = sample_targets['valid_query']
