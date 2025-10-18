@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import patch, Mock
 import subprocess
-from main import sanitize_target, run_tool, ALLOWED_TOOLS
+from main import sanitize_target, sanitize_ip_address, run_tool, ALLOWED_TOOLS
 
 
 class TestSanitizeTarget:
@@ -53,6 +53,72 @@ class TestSanitizeTarget:
         # Spaces should be stripped and result in empty string, which should raise an error after stripping
         with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
             sanitize_target("   ")
+
+
+class TestSanitizeIpAddress:
+    """Test the IP address sanitization function."""
+    
+    def test_sanitize_ip_address_valid_ipv4(self):
+        """Test sanitization with valid IPv4 addresses."""
+        valid_ipv4_addresses = [
+            "127.0.0.1",
+            "192.168.1.1",
+            "8.8.8.8",
+            "172.16.0.1",
+            "10.0.0.1",
+            "203.0.113.1",
+            "   192.168.1.1   "  # Should strip whitespace
+        ]
+        
+        for ip in valid_ipv4_addresses:
+            result = sanitize_ip_address(ip)
+            assert isinstance(result, str)
+            assert result == ip.strip()
+    
+    def test_sanitize_ip_address_valid_ipv6(self):
+        """Test sanitization with valid IPv6 addresses."""
+        valid_ipv6_addresses = [
+            "::1",
+            "2001:4860:4860::8888",
+            "2001:db8::1",
+            "fe80::1",
+            "::ffff:192.168.1.1",
+            "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+            "   2001:4860:4860::8888   "  # Should strip whitespace
+        ]
+        
+        for ip in valid_ipv6_addresses:
+            result = sanitize_ip_address(ip)
+            assert isinstance(result, str)
+            assert result == ip.strip()
+    
+    def test_sanitize_ip_address_invalid_addresses(self):
+        """Test that invalid IP addresses are rejected."""
+        invalid_addresses = [
+            "256.256.256.256",  # Invalid IPv4 octets
+            "192.168.1",        # Incomplete IPv4
+            "192.168.1.1.1",    # Too many IPv4 octets
+            "example.com",      # Domain name
+            "localhost",        # Hostname
+            "192.168.1.256",    # Invalid IPv4 octet
+            "gggg::1",          # Invalid IPv6 characters
+            "2001:4860:4860::8888::1234",  # Double :: in IPv6
+            "",                 # Empty string
+            "not_an_ip",        # Random string
+            "192.168.1.1; rm -rf /",  # Injection attempt
+        ]
+        
+        for invalid_ip in invalid_addresses:
+            with pytest.raises(ValueError, match="Invalid IP address"):
+                sanitize_ip_address(invalid_ip)
+    
+    def test_sanitize_ip_address_type_validation(self):
+        """Test that non-string inputs are rejected."""
+        invalid_types = [None, 123, [], {}, True]
+        
+        for invalid_input in invalid_types:
+            with pytest.raises(ValueError, match="Invalid IP address: must be a string"):
+                sanitize_ip_address(invalid_input)
 
 
 class TestRunTool:
@@ -133,7 +199,7 @@ class TestAllowedTools:
         expected_tools = [
             "nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit",
             "ping", "traceroute", "gobuster", "sherlock", "whatweb",
-            "hping3", "arping", "photon"
+            "hping3", "arping", "photon", "lynx", "dig", "geoiplookup"
         ]
         
         for tool in expected_tools:

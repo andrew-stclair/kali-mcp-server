@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch, Mock
 from main import (
     nmap_scan, nikto_scan, sqlmap_scan, wpscan_scan, dirb_scan,
-    searchsploit_query, ping_scan, traceroute_scan, gobuster_dir_scan,
+    searchsploit_query, ping_scan, traceroute_scan, dns_lookup, geoip_lookup, gobuster_dir_scan,
     gobuster_dns_scan, gobuster_vhost_scan, sherlock_scan, whatweb_scan,
     hping3_ping_scan, hping3_port_scan, hping3_traceroute_scan,
     arping_scan, photon_scan, lynx_extract_links, lynx_get_content
@@ -57,6 +57,66 @@ class TestNetworkScanningTools:
             text=True,
             timeout=120
         )
+
+    def test_dns_lookup_valid_target(self, mock_subprocess_run, sample_targets):
+        """Test dns_lookup with valid domain."""
+        target = sample_targets['valid_hostname']
+        result = dns_lookup(target)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['dig', 'ANY', target, '+noall', '+answer', '+additional'],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+
+    def test_dns_lookup_dangerous_input(self, sample_targets):
+        """Test dns_lookup rejects dangerous input."""
+        with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
+            dns_lookup(sample_targets['dangerous_input'])
+
+    def test_geoip_lookup_valid_ipv4(self, mock_subprocess_run, sample_targets):
+        """Test geoip_lookup with valid IPv4 address."""
+        target = sample_targets['valid_ip']
+        result = geoip_lookup(target)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['geoiplookup', target],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+
+    def test_geoip_lookup_valid_ipv6(self, mock_subprocess_run):
+        """Test geoip_lookup with valid IPv6 address."""
+        target = "2001:4860:4860::8888"  # Google's IPv6 DNS
+        result = geoip_lookup(target)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['geoiplookup', target],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+
+    def test_geoip_lookup_invalid_ip(self):
+        """Test geoip_lookup rejects invalid IP addresses."""
+        with pytest.raises(ValueError, match="Invalid IP address: not a valid IPv4 or IPv6 address"):
+            geoip_lookup("invalid_ip")
+        
+        with pytest.raises(ValueError, match="Invalid IP address: not a valid IPv4 or IPv6 address"):
+            geoip_lookup("256.256.256.256")
+        
+        with pytest.raises(ValueError, match="Invalid IP address: not a valid IPv4 or IPv6 address"):
+            geoip_lookup("example.com")
+
+    def test_geoip_lookup_dangerous_input(self, sample_targets):
+        """Test geoip_lookup rejects dangerous input."""
+        with pytest.raises(ValueError, match="Invalid IP address"):
+            geoip_lookup(sample_targets['dangerous_input'])
 
 
 class TestWebScanningTools:
@@ -311,7 +371,7 @@ class TestInputValidationAcrossAllTools:
     
     @pytest.mark.parametrize("tool_func", [
         nmap_scan, nikto_scan, sqlmap_scan, wpscan_scan, dirb_scan,
-        ping_scan, traceroute_scan, gobuster_dir_scan, gobuster_dns_scan,
+        ping_scan, traceroute_scan, dns_lookup, gobuster_dir_scan, gobuster_dns_scan,
         gobuster_vhost_scan, whatweb_scan, hping3_ping_scan, hping3_port_scan,
         hping3_traceroute_scan, arping_scan, photon_scan, lynx_extract_links, lynx_get_content
     ])
@@ -330,7 +390,7 @@ class TestInputValidationAcrossAllTools:
     
     @pytest.mark.parametrize("tool_func", [
         nmap_scan, nikto_scan, sqlmap_scan, wpscan_scan, dirb_scan,
-        searchsploit_query, ping_scan, traceroute_scan, gobuster_dir_scan,
+        searchsploit_query, ping_scan, traceroute_scan, dns_lookup, geoip_lookup, gobuster_dir_scan,
         gobuster_dns_scan, gobuster_vhost_scan, sherlock_scan, whatweb_scan,
         hping3_ping_scan, hping3_port_scan, hping3_traceroute_scan,
         arping_scan, photon_scan, lynx_extract_links, lynx_get_content
@@ -345,6 +405,8 @@ class TestInputValidationAcrossAllTools:
             target = sample_targets['valid_query']
         elif tool_func in [sherlock_scan]:
             target = sample_targets['valid_username']
+        elif tool_func in [dns_lookup]:
+            target = sample_targets['valid_hostname']
         else:
             target = sample_targets['valid_ip']
         

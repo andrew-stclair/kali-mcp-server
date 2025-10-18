@@ -1,17 +1,18 @@
 import os
 import subprocess
+import ipaddress
 from mcp.server.fastmcp import FastMCP
 
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, hping3, arping, photon, and lynx for web content analysis.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, dns lookup, geolocation lookup, hping3, arping, photon, and lynx for web content analysis.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping", "photon", "lynx"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping", "photon", "lynx", "dig", "geoiplookup"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -21,6 +22,21 @@ def sanitize_target(target: str) -> str:
     if not target or any(c in target for c in ";&|$`\n\r"):
         raise ValueError("Invalid target: contains dangerous characters")
     return target
+
+def sanitize_ip_address(ip: str) -> str:
+    """Sanitize and validate IP address (IPv4 or IPv6)."""
+    if ip is None or not isinstance(ip, str):
+        raise ValueError("Invalid IP address: must be a string")
+    ip = ip.strip()
+    if not ip:
+        raise ValueError("Invalid IP address: empty string")
+    
+    try:
+        # This will raise ValueError if not a valid IP address
+        ipaddress.ip_address(ip)
+        return ip
+    except ValueError:
+        raise ValueError("Invalid IP address: not a valid IPv4 or IPv6 address")
 
 def run_tool(tool: str, args: list) -> str:
     if tool not in ALLOWED_TOOLS:
@@ -143,6 +159,34 @@ def traceroute_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("traceroute", [target])
+
+@mcp.tool()
+def dns_lookup(target: str) -> str:
+    """
+    Perform comprehensive DNS lookup for all record types including A, AAAA, MX, NS, TXT, SOA, SRV, etc.
+    
+    Args:
+        target: The domain name to perform DNS lookup on
+        
+    Returns:
+        String containing comprehensive DNS lookup results for all record types
+    """
+    target = sanitize_target(target)
+    return run_tool("dig", ["ANY", target, "+noall", "+answer", "+additional"])
+
+@mcp.tool()
+def geoip_lookup(ip_address: str) -> str:
+    """
+    Perform geolocation lookup for an IP address (IPv4 or IPv6) to get location information.
+    
+    Args:
+        ip_address: The IPv4 or IPv6 address to perform geolocation lookup on
+        
+    Returns:
+        String containing geolocation information including country, region, city, ISP, etc.
+    """
+    ip_address = sanitize_ip_address(ip_address)
+    return run_tool("geoiplookup", [ip_address])
 
 @mcp.tool()
 def gobuster_dir_scan(target: str) -> str:
