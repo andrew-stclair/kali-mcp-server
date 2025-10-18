@@ -1,43 +1,96 @@
 # Kali MCP Pentest Server
 
-A Model Context Protocol (MCP) server that provides access to essential penetration testing tools through a standardized interface. Built on Kali Linux and designed for integration with AI assistants and automation platforms.
+A comprehensive Model Context Protocol (MCP) server that provides access to 22 essential penetration testing tools through a standardized interface. Built on Kali Linux and designed for integration with AI assistants and automation platforms.
 
 ## Overview
 
-This project packages essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls.
+This project packages essential security testing tools into an MCP server running in a containerized Kali Linux environment. It uses the FastMCP framework to expose security tools with proper input validation, timeout handling, and safety controls. Each tool is optimized for LLM integration with detailed output analysis capabilities.
 
 ## Available Tools
 
-The server provides the following security testing tools via MCP:
+The server provides 22 comprehensive security testing tools via MCP, organized by category:
 
-| Tool | Purpose | Parameter | Example Command |
-|------|---------|-----------|-----------------|
-| `nmap_scan` | Network port scanning | `target` (hostname/IP) | `nmap -Pn <target>` |
-| `nikto_scan` | Web server vulnerability scanning | `target` (hostname/IP) | `nikto -h <target>` |
-| `sqlmap_scan` | SQL injection testing | `target` (URL) | `sqlmap -u <target> --batch` |
-| `wpscan_scan` | WordPress security scanning | `target` (WordPress URL) | `wpscan --url <target>` |
-| `dirb_scan` | Directory/file enumeration | `target` (URL) | `dirb <target>` |
-| `gobuster_dir_scan` | Directory/file brute force | `target` (URL) | `gobuster dir -u <target> -w seclists/common` |
-| `gobuster_dns_scan` | DNS subdomain brute force | `target` (domain) | `gobuster dns -d <target> -w seclists/subdomains` |
-| `gobuster_vhost_scan` | Virtual host brute force | `target` (URL) | `gobuster vhost -u <target> -w seclists/subdomains` |
-| `searchsploit_query` | Exploit database search | `query` (search term) | `searchsploit <query>` |
-| `sherlock_scan` | Username reconnaissance across social networks | `username` (username to search) | `sherlock --timeout 30 --print-found <username>` |
-| `whatweb_scan` | Web technology identification | `target` (URL) | `whatweb --no-color <target>` |
-| `ping_scan` | Network connectivity test | `target` (hostname/IP) | `ping -c 4 <target>` |
-| `traceroute_scan` | Network path tracing | `target` (hostname/IP) | `traceroute <target>` |
-| `hping3_ping_scan` | TCP connectivity test | `target` (hostname/IP) | `hping3 -c 4 -S -p 80 <target>` |
-| `hping3_port_scan` | TCP port scanning | `target` (hostname/IP) | `hping3 -c 1 -S -p ++80 <target>` |
-| `hping3_traceroute_scan` | TCP traceroute | `target` (hostname/IP) | `hping3 --traceroute -c 3 -S -p 80 <target>` |
-| `arping_scan` | ARP ping for Layer 2 connectivity | `target` (hostname/IP) | `arping -c 4 <target>` |
-| `photon_scan` | Web crawler for OSINT reconnaissance | `target` (URL) | `photon -u <target> -l 2 --only-urls --timeout 30` |
+### Network Discovery & Scanning
+| Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
+|------|---------|------------|------------------------------|
+| `nmap_scan` | Network port scanning and host discovery | hostname/IP/range | Open ports, service versions, OS detection for further targeting |
+| `ping_scan` | ICMP connectivity testing | hostname/IP | IP resolution, latency, availability for follow-up scans |
+| `traceroute_scan` | Network path tracing | hostname/IP | Router IPs, network topology for infrastructure mapping |
+| `arping_scan` | Layer 2 ARP host discovery | local IP | MAC addresses, vendor info for local network mapping |
+
+### Advanced Network Testing
+| Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
+|------|---------|------------|------------------------------|
+| `hping3_ping_scan` | TCP connectivity through firewalls | hostname/IP | Firewall bypass, advanced connectivity testing |
+| `hping3_port_scan` | Stealthy TCP port scanning | hostname/IP | Stealth scanning results, security device detection |
+| `hping3_traceroute_scan` | TCP-based network path tracing | hostname/IP | Firewall-aware routing, network security analysis |
+
+### DNS & Infrastructure Analysis
+| Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
+|------|---------|------------|------------------------------|
+| `dns_lookup` | Comprehensive DNS record enumeration | domain name | A/AAAA/MX/NS/TXT/SRV records for infrastructure mapping |
+| `gobuster_dns_scan` | High-speed subdomain enumeration | domain name | Hidden subdomains, additional attack surfaces |
+| `geoip_lookup` | IP geolocation and ISP analysis | IPv4/IPv6 address | Geographic location, ISP info, network ownership |
+
+### Web Application Security
+| Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
+|------|---------|------------|------------------------------|
+| `nikto_scan` | Web server vulnerability scanning | URL/hostname | Vulnerabilities, misconfigurations, attack vectors |
+| `sqlmap_scan` | Automated SQL injection testing | URL with parameters | Database vulnerabilities, injection points |
+| `wpscan_scan` | WordPress security assessment | WordPress URL | Plugin/theme vulnerabilities, user enumeration |
+| `dirb_scan` | Directory/file brute force discovery | URL | Hidden directories, admin panels, sensitive files |
+| `gobuster_dir_scan` | High-speed directory enumeration | URL | Fast directory discovery, backup files |
+| `gobuster_vhost_scan` | Virtual host discovery | URL/IP | Hidden vhosts, shared hosting enumeration |
+
+### Web Content Analysis
+| Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
+|------|---------|------------|------------------------------|
+| `whatweb_scan` | Web technology fingerprinting | URL | CMS detection, framework identification, versions |
+| `photon_scan` | Intelligent web crawling & OSINT | URL | URLs, emails, API endpoints, social media links |
+| `lynx_extract_links` | Comprehensive link extraction | URL | All hyperlinks, forms, resources for further testing |
+| `lynx_get_content` | Clean text content for LLM analysis | URL | Formatted page content, forms, error messages |
+
+### Intelligence & Research Tools
+| Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
+|------|---------|------------|------------------------------|
+| `searchsploit_query` | Exploit database search | software/version/CVE | Available exploits, PoCs, security advisories |
+| `sherlock_scan` | Username reconnaissance | username | Social media profiles, digital footprint mapping |
+
+## LLM Integration & Tool Chaining
+
+### Intelligent Tool Sequencing
+The tools are designed for intelligent chaining and LLM-driven analysis:
+
+1. **Discovery Phase**: `ping_scan` → `nmap_scan` → `dns_lookup` → `geoip_lookup`
+2. **Web Analysis**: `whatweb_scan` → `nikto_scan` → `dirb_scan` → `gobuster_dir_scan`
+3. **Content Analysis**: `lynx_extract_links` → `lynx_get_content` → `sqlmap_scan`
+4. **Intelligence Gathering**: `photon_scan` → `sherlock_scan` → `searchsploit_query`
+
+### Cross-Tool Data Flow Examples
+
+- **IP Discovery**: Extract IPs from `nmap_scan` → feed to `geoip_lookup`
+- **Subdomain Enumeration**: Get subdomains from `gobuster_dns_scan` → test each with `whatweb_scan`
+- **Vulnerability Research**: Find services in `nmap_scan` → search versions with `searchsploit_query`
+- **Social Engineering**: Discover usernames → use `sherlock_scan` → analyze profiles with `lynx_get_content`
+
+### LLM Analysis Capabilities
+
+Each tool provides structured output optimized for:
+- **Pattern Recognition**: Identifying attack vectors and vulnerabilities
+- **Data Extraction**: Parsing IPs, URLs, versions, and credentials
+- **Risk Assessment**: Prioritizing findings based on severity and exploitability
+- **Report Generation**: Creating comprehensive security assessments
+- **Automated Decision Making**: Determining next steps in reconnaissance
 
 ## Architecture
 
-- **Base**: Kali Linux (`kalilinux/kali-rolling`) Docker container
-- **Framework**: FastMCP for MCP protocol implementation
-- **Transport**: StreamableHTTP (supports SSE and HTTP endpoints)
-- **Security**: Non-root execution with minimal required capabilities
-- **Dependencies**: Python virtual environment with required packages
+- **Base**: Kali Linux (`kalilinux/kali-rolling`) Docker container with 22 security tools
+- **Framework**: FastMCP for MCP protocol implementation with LLM-optimized interfaces  
+- **Transport**: StreamableHTTP (supports SSE and HTTP endpoints for maximum compatibility)
+- **Security**: Non-root execution with minimal required capabilities (`NET_RAW`, `NET_ADMIN`, `NET_BIND_SERVICE`)
+- **Dependencies**: Python virtual environment with comprehensive security tool integration
+- **Input Validation**: Advanced sanitization for IP addresses, URLs, and general targets
+- **Tool Safety**: Whitelisted tool execution with timeout controls and error handling
 
 ## Quick Start
 
@@ -198,18 +251,19 @@ make ci-test
 
 The test suite includes:
 
-- **Unit Tests** (`tests/test_utils.py`): Test core utility functions like input sanitization and tool execution
-- **MCP Tool Tests** (`tests/test_mcp_tools.py`): Test all 18 MCP tool functions with mock execution
+- **Unit Tests** (`tests/test_utils.py`): Test core utility functions including IP address validation, input sanitization, and tool execution
+- **MCP Tool Tests** (`tests/test_mcp_tools.py`): Test all 22 MCP tool functions with comprehensive mock execution and validation
 - **Server Integration Tests** (`tests/test_mcp_server.py`): Test MCP server initialization and configuration
 - **End-to-End Integration Tests** (`tests/test_integration.py`): Test complete workflows and error handling
 
 #### Test Coverage
 
 - Maintains **97%+ code coverage** with a minimum threshold of 85%
-- Tests all 18 security tools exposed via MCP protocol
-- Validates input sanitization and command injection prevention
+- Tests all 22 security tools exposed via MCP protocol
+- Validates both general input sanitization and IP-specific validation
 - Tests error handling for timeouts, permissions, and missing tools
-- Ensures tool whitelisting security controls
+- Ensures tool whitelisting security controls and capability requirements
+- Comprehensive IPv4 and IPv6 address validation testing
 
 #### GitHub Actions CI/CD
 
