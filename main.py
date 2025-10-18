@@ -234,12 +234,15 @@ def gobuster_vhost_scan(target: str) -> str:
 def sherlock_scan(username: str) -> str:
     """
     Run sherlock username reconnaissance tool to find social media accounts.
+
+    This tool returns a list of URL's, It is worth getting the content of these pages
+    separately to extract more useful information.
     
     Args:
         username: The username to search for across social networks
         
     Returns:
-        String containing sherlock scan results with found social media profiles
+        String containing sherlock scan results with url's of found social media profiles
     """
     username = sanitize_target(username)
     return run_tool("sherlock", ["--timeout", "3", "--print-found", "--no-color", username])
