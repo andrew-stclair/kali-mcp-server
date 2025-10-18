@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 # Initialize MCP Server
 mcp = FastMCP(
     name="kali-mcp-pentest-server",
-    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, hping3, arping, and photon.",
+    instructions="A penetration testing MCP server providing access to common security tools like nmap, nikto, sqlmap, wpscan, dirb, gobuster, searchsploit, sherlock, whatweb, ping, traceroute, hping3, arping, photon, and lynx for web content analysis.",
     host="0.0.0.0",
     port=8080
 )
 
 # Environment config
-ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping", "photon"]
+ALLOWED_TOOLS = ["nmap", "nikto", "sqlmap", "wpscan", "dirb", "searchsploit", "ping", "traceroute", "gobuster", "sherlock", "whatweb", "hping3", "arping", "photon", "lynx"]
 
 # Input sanitization helper
 def sanitize_target(target: str) -> str:
@@ -198,7 +198,7 @@ def sherlock_scan(username: str) -> str:
         String containing sherlock scan results with found social media profiles
     """
     username = sanitize_target(username)
-    return run_tool("sherlock", ["--timeout", "30", "--print-found", "--no-color", username])
+    return run_tool("sherlock", ["--timeout", "3", "--print-found", "--no-color", username])
 
 @mcp.tool()
 def whatweb_scan(target: str) -> str:
@@ -283,6 +283,34 @@ def photon_scan(target: str) -> str:
     """
     target = sanitize_target(target)
     return run_tool("photon", ["-u", target, "-l", "2", "--only-urls", "--timeout", "30"])
+
+@mcp.tool()
+def lynx_extract_links(target: str) -> str:
+    """
+    Extract all links from a web page using lynx browser.
+    
+    Args:
+        target: The target URL to extract links from
+        
+    Returns:
+        String containing all links found on the page
+    """
+    target = sanitize_target(target)
+    return run_tool("lynx", ["-dump", "-listonly", target])
+
+@mcp.tool()
+def lynx_get_content(target: str) -> str:
+    """
+    Get web page content formatted for LLM context using lynx browser.
+    
+    Args:
+        target: The target URL to retrieve content from
+        
+    Returns:
+        String containing formatted text content of the web page
+    """
+    target = sanitize_target(target)
+    return run_tool("lynx", ["-dump", "-nolist", "-width=120", target])
 
 # Legacy HTTP endpoint compatibility (optional)
 @mcp.custom_route("/", methods=["GET"])
