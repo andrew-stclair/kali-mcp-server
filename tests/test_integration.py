@@ -27,7 +27,7 @@ class TestEndToEndIntegration:
         assert "Nmap scan report" in result
         assert "example.com" in result
         mock_subprocess_run.assert_called_once_with(
-            ['nmap', '-Pn', target],
+            ['nmap', '-Pn', '-p', '21,22,23,25,80,443,3306,3389,5432,8080', target],
             capture_output=True,
             text=True,
             timeout=120
@@ -160,7 +160,7 @@ class TestSecurityIntegration:
         nmap_scan("example.com")
         
         called_args = mock_subprocess_run.call_args[0][0]
-        assert called_args == ['nmap', '-Pn', 'example.com']
+        assert called_args == ['nmap', '-Pn', '-p', '21,22,23,25,80,443,3306,3389,5432,8080', 'example.com']
         # Verify no shell interpretation
         assert not any(';' in arg or '&' in arg or '|' in arg for arg in called_args)
 
@@ -169,7 +169,7 @@ class TestToolSpecificIntegration:
     """Test tool-specific integration scenarios."""
     
     @pytest.mark.parametrize("tool_func,expected_cmd_start", [
-        (nmap_scan, ['nmap', '-Pn']),
+        (nmap_scan, ['nmap', '-Pn', '-p']),
         (nikto_scan, ['nikto', '-h']),
         (sqlmap_scan, ['sqlmap', '-u']),
         (ping_scan, ['ping', '-c', '4'])

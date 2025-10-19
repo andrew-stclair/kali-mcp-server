@@ -13,7 +13,7 @@ The server provides 22 comprehensive security testing tools via MCP, organized b
 ### Network Discovery & Scanning
 | Tool | Purpose | Input Type | Key Outputs for LLM Analysis |
 |------|---------|------------|------------------------------|
-| `nmap_scan` | Network port scanning and host discovery | hostname/IP/range | Open ports, service versions, OS detection for further targeting |
+| `nmap_scan` | Network port scanning and host discovery | hostname/IP/range + optional ports | Open ports, service versions, OS detection for further targeting. Scans 10 common ports by default (21,22,23,25,80,443,3306,3389,5432,8080). Use `ports` parameter to scan custom ports or ranges (e.g., "80,443" or "1-1000"). |
 | `ping_scan` | ICMP connectivity testing | hostname/IP | IP resolution, latency, availability for follow-up scans |
 | `traceroute_scan` | Network path tracing | hostname/IP | Router IPs, network topology for infrastructure mapping |
 | `arping_scan` | Layer 2 ARP host discovery | local IP | MAC addresses, vendor info for local network mapping |

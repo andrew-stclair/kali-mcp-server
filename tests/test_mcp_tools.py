@@ -14,23 +14,57 @@ from main import (
 class TestNetworkScanningTools:
     """Test network scanning and reconnaissance tools."""
     
-    def test_nmap_scan_valid_target(self, mock_subprocess_run, sample_targets):
-        """Test nmap_scan with valid target."""
+    def test_nmap_scan_valid_target_default_ports(self, mock_subprocess_run, sample_targets):
+        """Test nmap_scan with valid target using default ports."""
         target = sample_targets['valid_ip']
         result = nmap_scan(target)
         
         assert isinstance(result, str)
         mock_subprocess_run.assert_called_with(
-            ['nmap', '-Pn', target],
+            ['nmap', '-Pn', '-p', '21,22,23,25,80,443,3306,3389,5432,8080', target],
             capture_output=True,
             text=True,
             timeout=120
         )
     
-    def test_nmap_scan_dangerous_input(self, sample_targets):
-        """Test nmap_scan rejects dangerous input."""
+    def test_nmap_scan_valid_target_custom_ports(self, mock_subprocess_run, sample_targets):
+        """Test nmap_scan with valid target and custom ports."""
+        target = sample_targets['valid_ip']
+        ports = "80,443,8080"
+        result = nmap_scan(target, ports)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['nmap', '-Pn', '-p', ports, target],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+    
+    def test_nmap_scan_valid_target_port_range(self, mock_subprocess_run, sample_targets):
+        """Test nmap_scan with valid target and port range."""
+        target = sample_targets['valid_ip']
+        ports = "1-1000"
+        result = nmap_scan(target, ports)
+        
+        assert isinstance(result, str)
+        mock_subprocess_run.assert_called_with(
+            ['nmap', '-Pn', '-p', ports, target],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+    
+    def test_nmap_scan_dangerous_input_target(self, sample_targets):
+        """Test nmap_scan rejects dangerous input in target."""
         with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
             nmap_scan(sample_targets['dangerous_input'])
+    
+    def test_nmap_scan_dangerous_input_ports(self, sample_targets):
+        """Test nmap_scan rejects dangerous input in ports."""
+        target = sample_targets['valid_ip']
+        with pytest.raises(ValueError, match="Invalid target: contains dangerous characters"):
+            nmap_scan(target, sample_targets['dangerous_input'])
     
     def test_ping_scan_valid_target(self, mock_subprocess_run, sample_targets):
         """Test ping_scan with valid target."""
