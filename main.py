@@ -49,15 +49,18 @@ def run_tool(tool: str, args: list) -> str:
         return f"Error running {tool}: {str(e)}"
 
 @mcp.tool()
-def nmap_scan(target: str) -> str:
+def nmap_scan(target: str, ports: str = "21,22,23,25,80,443,3306,3389,5432,8080") -> str:
     """
     Perform network port scanning and host discovery using Nmap.
     
     This tool performs a basic Nmap scan with host discovery disabled (-Pn) to enumerate 
-    open ports, running services, and basic host information. Essential for network reconnaissance.
+    open ports, running services, and basic host information. By default, scans 10 commonly 
+    used ports for faster results. Essential for network reconnaissance.
     
     Args:
         target: The target hostname, IP address, or IP range (e.g., "example.com", "192.168.1.1", "192.168.1.0/24")
+        ports: Comma-separated list of ports to scan (default: "21,22,23,25,80,443,3306,3389,5432,8080")
+               Examples: "80,443" for web ports, "1-1000" for port range, "80,443,8000-9000" for mixed
         
     Returns:
         String containing detailed scan results including:
@@ -67,6 +70,10 @@ def nmap_scan(target: str) -> str:
         - MAC addresses (for local network targets)
         
     LLM Usage Tips:
+        - By default scans 10 common ports: FTP(21), SSH(22), Telnet(23), SMTP(25), HTTP(80), 
+          HTTPS(443), MySQL(3306), RDP(3389), PostgreSQL(5432), HTTP-Alt(8080)
+        - Specify custom ports for targeted scanning (e.g., ports="80,443,8443" for web services)
+        - Use port ranges for broader scans (e.g., ports="1-1000" or ports="1-65535" for full scan)
         - Extract open ports for further investigation with specific service scanners
         - Use discovered services as input for vulnerability scanning (nikto_scan, sqlmap_scan)
         - Parse service versions to search for exploits using searchsploit_query
@@ -74,7 +81,8 @@ def nmap_scan(target: str) -> str:
         - Use IP addresses from results with geoip_lookup for location analysis
     """
     target = sanitize_target(target)
-    return run_tool("nmap", ["-Pn", target])
+    ports = sanitize_target(ports)
+    return run_tool("nmap", ["-Pn", "-p", ports, target])
 
 @mcp.tool()
 def nikto_scan(target: str) -> str:
