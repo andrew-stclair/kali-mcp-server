@@ -118,6 +118,9 @@ docker run -p 8080:8080 \
   --cap-add=NET_RAW \
   --cap-add=NET_ADMIN \
   --cap-add=NET_BIND_SERVICE \
+  --read-only \
+  --tmpfs /tmp \
+  --tmpfs /var/tmp \
   kali-mcp-server
 ```
 
@@ -129,6 +132,9 @@ docker run -p 8080:8080 \
   --cap-add=NET_RAW \
   --cap-add=NET_ADMIN \
   --cap-add=NET_BIND_SERVICE \
+  --read-only \
+  --tmpfs /tmp \
+  --tmpfs /var/tmp \
   ghcr.io/andrew-stclair/kali-mcp-server/kali-mcp-server:latest
 ```
 
@@ -306,6 +312,13 @@ The GitHub Actions workflow (`.github/workflows/docker-build.yml`):
 - The container requires elevated network capabilities for certain tools
 - Input validation helps prevent command injection but shouldn't be your only security layer
 - Monitor logs for suspicious activity
+
+### Security Hardening
+
+- **Read-Only Filesystem**: Container runs with `--read-only` flag to prevent filesystem modifications
+- **Temporary Filesystems**: Uses tmpfs mounts for `/tmp` and `/var/tmp` for necessary temporary operations
+- **Non-Root Execution**: All tools run as unprivileged `kaliuser` account
+- **Minimal Capabilities**: Only essential network capabilities are granted
 
 ### Capabilities Required
 
