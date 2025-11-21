@@ -464,7 +464,7 @@ def sherlock_scan(username: str) -> str:
         - Use profile information for targeted phishing and social engineering awareness
     """
     username = sanitize_target(username)
-    return run_tool("sherlock", ["--timeout", "3", "--print-found", "--no-color", username])
+    return run_tool("sherlock", ["--timeout", "3", "--print-found", "--no-color", "--no-txt", "--local", username])
 
 @mcp.tool()
 def whatweb_scan(target: str) -> str:
