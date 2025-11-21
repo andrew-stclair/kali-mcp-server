@@ -324,7 +324,7 @@ class TestReconnaissanceTools:
         
         assert isinstance(result, str)
         mock_subprocess_run.assert_called_with(
-            ['sherlock', '--timeout', '3', '--print-found', '--no-color', username],
+            ['sherlock', '--timeout', '3', '--print-found', '--no-color', '--no-txt', '--local', username],
             capture_output=True,
             text=True,
             timeout=120
