@@ -2,8 +2,8 @@ FROM kalilinux/kali-rolling
 
 # Install required tools
 RUN apt-get update && apt-get install -y \
-    nmap nikto sqlmap wpscan dirb gobuster seclists exploitdb sherlock whatweb python3 python3-pip python3-venv sudo libcap2-bin \
-    iputils-ping traceroute hping3 arping photon lynx dnsutils geoip-bin geoip-database && \
+    nmap nikto sqlmap wpscan dirb gobuster seclists exploitdb whatweb python3 python3-pip python3-venv sudo libcap2-bin \
+    iputils-ping traceroute hping3 arping photon lynx dnsutils geoip-bin geoip-database git pipx && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -21,6 +21,15 @@ RUN setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap && \
 # Switch to non-root user
 USER kaliuser
 WORKDIR /home/kaliuser/app
+
+# Add .local/bin to PATH for pipx-installed tools
+ENV PATH="/home/kaliuser/.local/bin:${PATH}"
+
+# Install sherlock from GitHub using pipx
+RUN git clone https://github.com/sherlock-project/sherlock /tmp/sherlock && \
+    cd /tmp/sherlock && \
+    pipx install . --force && \
+    rm -rf /tmp/sherlock
 
 # Create virtual environment and install Python dependencies
 RUN python3 -m venv venv && \
