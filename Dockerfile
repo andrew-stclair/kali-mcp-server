@@ -29,7 +29,8 @@ ENV PATH="/home/kaliuser/.local/bin:${PATH}"
 RUN git clone https://github.com/sherlock-project/sherlock /tmp/sherlock && \
     cd /tmp/sherlock && \
     pipx install . --force && \
-    rm -rf /tmp/sherlock
+    rm -rf /tmp/sherlock && \
+    sherlock --version
 
 # Create virtual environment and install Python dependencies
 RUN python3 -m venv venv && \
