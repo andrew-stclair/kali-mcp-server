@@ -149,19 +149,19 @@ class TestRunTool:
             expected_cmd, 
             capture_output=True, 
             text=True, 
-            timeout=120
+            timeout=300
         )
     
     def test_run_tool_timeout_handling(self, mock_subprocess_run):
         """Test that timeout is properly configured."""
         run_tool("ping", ["-c", "1", "127.0.0.1"])
         
-        # Verify timeout is set to 120 seconds
+        # Verify timeout is set to 300 seconds
         mock_subprocess_run.assert_called_with(
             ["ping", "-c", "1", "127.0.0.1"],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_run_tool_exception_handling(self):

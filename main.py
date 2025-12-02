@@ -43,7 +43,7 @@ def run_tool(tool: str, args: list) -> str:
         raise ValueError(f"Tool not allowed: {tool}")
     cmd = [tool] + args
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
         return result.stdout + "\n" + result.stderr
     except Exception as e:
         return f"Error running {tool}: {str(e)}"

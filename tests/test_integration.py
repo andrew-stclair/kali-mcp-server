@@ -30,7 +30,7 @@ class TestEndToEndIntegration:
             ['nmap', '-Pn', '-p', '21,22,23,25,80,443,3306,3389,5432,8080', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_sqlmap_integration_workflow(self, mock_subprocess_run):
@@ -51,7 +51,7 @@ class TestEndToEndIntegration:
             ['sqlmap', '-u', target, '--batch'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_ping_integration_workflow(self, mock_subprocess_run):
@@ -72,7 +72,7 @@ class TestEndToEndIntegration:
             ['ping', '-c', '4', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
 
