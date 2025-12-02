@@ -184,7 +184,7 @@ curl -H "Accept: text/event-stream" http://localhost:8080/sse
 - Runs as non-root user (`kaliuser`)
 - Uses Python virtual environment for dependency isolation
 - Required Linux capabilities: `NET_RAW`, `NET_ADMIN`, `NET_BIND_SERVICE`
-- Tool execution timeout: 120 seconds
+- Tool execution timeout: 300 seconds (5 minutes)
 
 ### Tool Restrictions
 - Only whitelisted tools can be executed

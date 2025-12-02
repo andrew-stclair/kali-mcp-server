@@ -24,7 +24,7 @@ class TestNetworkScanningTools:
             ['nmap', '-Pn', '-p', '21,22,23,25,80,443,3306,3389,5432,8080', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_nmap_scan_valid_target_custom_ports(self, mock_subprocess_run, sample_targets):
@@ -38,7 +38,7 @@ class TestNetworkScanningTools:
             ['nmap', '-Pn', '-p', ports, target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_nmap_scan_valid_target_port_range(self, mock_subprocess_run, sample_targets):
@@ -52,7 +52,7 @@ class TestNetworkScanningTools:
             ['nmap', '-Pn', '-p', ports, target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_nmap_scan_dangerous_input_target(self, sample_targets):
@@ -76,7 +76,7 @@ class TestNetworkScanningTools:
             ['ping', '-c', '4', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_traceroute_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -89,7 +89,7 @@ class TestNetworkScanningTools:
             ['traceroute', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_dns_lookup_valid_target(self, mock_subprocess_run, sample_targets):
@@ -102,7 +102,7 @@ class TestNetworkScanningTools:
             ['dig', 'ANY', target, '+noall', '+answer', '+additional'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_dns_lookup_dangerous_input(self, sample_targets):
@@ -120,7 +120,7 @@ class TestNetworkScanningTools:
             ['geoiplookup', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_geoip_lookup_valid_ipv6(self, mock_subprocess_run):
@@ -133,7 +133,7 @@ class TestNetworkScanningTools:
             ['geoiplookup', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_geoip_lookup_invalid_ip(self):
@@ -166,7 +166,7 @@ class TestWebScanningTools:
             ['nikto', '-h', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_sqlmap_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -179,7 +179,7 @@ class TestWebScanningTools:
             ['sqlmap', '-u', target, '--batch'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_wpscan_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -192,7 +192,7 @@ class TestWebScanningTools:
             ['wpscan', '--url', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_dirb_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -205,7 +205,7 @@ class TestWebScanningTools:
             ['dirb', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_whatweb_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -218,7 +218,7 @@ class TestWebScanningTools:
             ['whatweb', '--no-color', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_lynx_extract_links_valid_target(self, mock_subprocess_run, sample_targets):
@@ -231,7 +231,7 @@ class TestWebScanningTools:
             ['lynx', '-dump', '-listonly', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_lynx_get_content_valid_target(self, mock_subprocess_run, sample_targets):
@@ -244,7 +244,7 @@ class TestWebScanningTools:
             ['lynx', '-dump', '-nolist', '-width=120', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
     def test_lynx_extract_links_dangerous_input(self, sample_targets):
@@ -271,7 +271,7 @@ class TestGobusterTools:
             ['gobuster', 'dir', '-u', target, '-w', '/usr/share/seclists/Discovery/Web-Content/common.txt'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_gobuster_dns_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -284,7 +284,7 @@ class TestGobusterTools:
             ['gobuster', 'dns', '-d', target, '-w', '/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_gobuster_vhost_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -297,7 +297,7 @@ class TestGobusterTools:
             ['gobuster', 'vhost', '-u', target, '-w', '/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
 
@@ -314,7 +314,7 @@ class TestReconnaissanceTools:
             ['searchsploit', query],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_sherlock_scan_valid_username(self, mock_subprocess_run, sample_targets):
@@ -327,7 +327,7 @@ class TestReconnaissanceTools:
             ['sherlock', '--timeout', '3', '--print-found', '--no-color', '--no-txt', '--local', username],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_photon_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -340,7 +340,7 @@ class TestReconnaissanceTools:
             ['photon', '-u', target, '-l', '2', '--only-urls', '--timeout', '30'],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
 
@@ -357,7 +357,7 @@ class TestHping3Tools:
             ['hping3', '-c', '4', '-S', '-p', '80', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_hping3_port_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -370,7 +370,7 @@ class TestHping3Tools:
             ['hping3', '-c', '1', '-S', '-p', '80', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_hping3_traceroute_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -383,7 +383,7 @@ class TestHping3Tools:
             ['hping3', '--traceroute', '-c', '3', '-S', '-p', '80', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     
     def test_arping_scan_valid_target(self, mock_subprocess_run, sample_targets):
@@ -396,7 +396,7 @@ class TestHping3Tools:
             ['arping', '-c', '4', target],
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
 
 
