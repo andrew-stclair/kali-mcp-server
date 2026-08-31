@@ -1,4 +1,4 @@
 fastapi
 uvicorn
 python-multipart
-mcp>=2.0.0
+mcp>=2.1.1
